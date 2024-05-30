@@ -8,6 +8,9 @@ const UserSchema = new mongoose.Schema({
         salt: { type: String, select: false},
         sessionToken: { type: String, select: false },
     },
+    likedDesigners: [{
+        type: mongoose.Schema.Types.ObjectId, ref: 'Designer'
+    }]
 });
 
 export const UserModel = mongoose.model('User', UserSchema);
@@ -22,3 +25,4 @@ export const createUser = (values: Record<string, any>) => new UserModel(values)
     .save().then((user) => user.toObject());
 export const deleteUserById = (id: string) => UserModel.findOneAndDelete({ _id: id });
 export const updateUserById = (id: string, values: Record<string, any>) => UserModel.findByIdAndUpdate(id, values);
+export const getLikedDesignersForUser = (userId: string) => UserModel.findById(userId).populate('likedDesigners');
