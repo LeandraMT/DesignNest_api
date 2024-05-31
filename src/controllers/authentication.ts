@@ -11,14 +11,14 @@ export const register = async (req: express.Request, res: express.Response) => {
             return res.sendStatus(400);
         }
 
-        if (!['user', 'designer'].includes(accountType)) {
+        if (!['User', 'Designer'].includes(accountType)) {
             return res.sendStatus(400);
         }
 
         let existingAccount;
-        if (accountType === 'user') {
+        if (accountType === 'User') {
             existingAccount = await getUserByEmail(email);
-        } else {
+        } else if (accountType == 'Designer') {
             existingAccount = await getDesignerByEmail(email);
         }
 
@@ -30,7 +30,7 @@ export const register = async (req: express.Request, res: express.Response) => {
         const hashedPassword = authentication(salt, password);
 
         let account;
-        if (accountType === 'user') {
+        if (accountType === 'User') {
             account = await createUser({
                 email,
                 username,
@@ -39,7 +39,7 @@ export const register = async (req: express.Request, res: express.Response) => {
                     password: hashedPassword,
                 }
             });
-        } else {
+        } else if (accountType === 'Designer') {
             account = await createDesigner({
                 email,
                 username,

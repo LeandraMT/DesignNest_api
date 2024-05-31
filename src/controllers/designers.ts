@@ -5,13 +5,14 @@ import { getDesigners, deleteDesignerById, updateDesignerById } from '../db/desi
 export const getAllDesigners = async (req: express.Request, res: express.Response) => {
     try {
         const designers = await getDesigners();
+        console.log("Fetching Designers: ", designers);
 
         return res.status(200).json(designers);
     } catch (error) {
         console.log(error);
         return res.sendStatus(500);
     }
-}
+};
 
 export const deleteDesigner = async (req: express.Request, res: express.Response) => {
     try {
