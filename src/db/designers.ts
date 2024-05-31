@@ -26,15 +26,18 @@ const DesignerSchema = new mongoose.Schema({
         salt: { type: String, select: false},
         sessionToken: { type: String, select: false },
     },
-    images: [ImageSchema],
-    videos: [VideoSchema],
-    links: [LinkSchema]
+    portfolio: {
+        images: [{ type: String }],
+        videos: [{ type: String }],
+        links: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Link' }]
+    },
+    blogPosts: [{ type: mongoose.Schema.Types.ObjectId, ref: 'BlogPost' }]
 });
 
 export const DesignerModel = mongoose.model('Designer', DesignerSchema);
 
 export const getDesigners = () => DesignerModel.find();
-export const getDesignerByUsername = (username: string) => DesignerModel.findOne({ username });
+export const getDesignerByEmail = (email: string) => DesignerModel.findOne({ email });
 export const getDesignerById = (id: string) => DesignerModel.findById(id);
 export const createDesigner = (values: Record<string, any>) => new DesignerModel(values)
     .save().then((designer) => designer.toObject());

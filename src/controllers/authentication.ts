@@ -1,38 +1,62 @@
 import express from 'express';
-
 import { authentication, random } from '../auth';
 import { createUser, getUserByEmail } from '../db/users';
+import { createDesigner, getDesignerByEmail } from '../db/designers';
 
 export const register = async (req: express.Request, res: express.Response) => {
     try {
-        const { email, password, username } = req.body;
+        const { email, password, username, accountType } = req.body;
 
-        if (!email || !password || !username) {
+        if (!email || !password || !username || !accountType) {
             return res.sendStatus(400);
         }
 
-        const existingUser = await getUserByEmail(email);
+        if (!['user', 'designer'].includes(accountType)) {
+            return res.sendStatus(400);
+        }
 
-        if (existingUser) {
+        let existingAccount;
+        if (accountType === 'user') {
+            existingAccount = await getUserByEmail(email);
+        } else {
+            existingAccount = await getDesignerByEmail(email);
+        }
+
+        if (existingAccount) {
             return res.sendStatus(400);
         }
 
         const salt = random();
-        const user = await createUser({
-            email,
-            username,
-            authentication: {
-                salt,
-                password: authentication(salt, password),
-            }
-        });
+        const hashedPassword = authentication(salt, password);
 
-        return res.status(200).json(user).end();
+        let account;
+        if (accountType === 'user') {
+            account = await createUser({
+                email,
+                username,
+                authentication: {
+                    salt,
+                    password: hashedPassword,
+                }
+            });
+        } else {
+            account = await createDesigner({
+                email,
+                username,
+                authentication: {
+                    salt,
+                    password: hashedPassword,
+                }
+            });
+        }
+
+        return res.status(200).json(account).end();
     } catch (error) {
         console.log(error);
         return res.sendStatus(500);
     }
 };
+
 
 export const login = async (req: express.Request, res: express.Response) => {
     try {
@@ -43,23 +67,25 @@ export const login = async (req: express.Request, res: express.Response) => {
         }
 
         const user = await getUserByEmail(email).select('+authentication.salt +authentication.password');
+        const designer = await getDesignerByEmail(email).select('+authentication.salt +authentication.password');
+        const account = user || designer;
 
-        if (!user || !user.authentication) {
+        if (!account || !account.authentication) {
             return res.sendStatus(400);
         }
 
-        const hashedPassword = authentication(user.authentication.salt!, password);
+        const hashedPassword = authentication(account.authentication.salt!, password);
 
-        if (user.authentication.password !== hashedPassword) {
+        if (account.authentication.password !== hashedPassword) {
             return res.sendStatus(403);
         }
 
         const salt = random();
-        user.authentication.sessionToken = authentication(salt, user._id.toString());
+        account.authentication.sessionToken = authentication(salt, account._id.toString());
 
-        await user.save();
+        await account.save();
 
-        res.cookie('demo_auth', user.authentication.sessionToken,
+        res.cookie('demo_auth', account.authentication.sessionToken,
             {
                 domain: 'localhost',
                 path: '/'
@@ -71,4 +97,4 @@ export const login = async (req: express.Request, res: express.Response) => {
         console.log(error);
         return res.sendStatus(500);
     }
-}
+};
