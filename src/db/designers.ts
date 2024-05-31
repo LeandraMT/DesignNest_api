@@ -31,7 +31,7 @@ const DesignerSchema = new mongoose.Schema({
     links: [LinkSchema]
 });
 
-export const DesignerModel = mongoose.model('User', DesignerSchema);
+export const DesignerModel = mongoose.model('Designer', DesignerSchema);
 
 export const getDesigners = () => DesignerModel.find();
 export const getDesignerByUsername = (username: string) => DesignerModel.findOne({ username });
@@ -39,4 +39,7 @@ export const getDesignerById = (id: string) => DesignerModel.findById(id);
 export const createDesigner = (values: Record<string, any>) => new DesignerModel(values)
     .save().then((designer) => designer.toObject());
 export const deleteDesignerById = (id: string) => DesignerModel.findOneAndDelete({ _id: id });
-export const updateDesignerById = (id: string, values: Record<string, any>) => DesignerModel.findByIdAndUpdate(id, values);
+export const updateDesignerById = (id: string, values: Record<string, any>) => DesignerModel.findByIdAndUpdate(id, values, { new: true });
+export const getDesignerBySessionToken = (sessionToken: string) => DesignerModel.findOne({
+    'authentication.sessionToken': sessionToken
+});

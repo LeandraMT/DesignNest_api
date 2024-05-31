@@ -1,6 +1,7 @@
 import express from 'express';
 
 import { deleteUserById, getUserById, getUsers } from '../db/users';
+import { random, authentication } from '../auth/index';
 
 export const getAllUsers = async (req: express.Request, res: express.Response) => {
     try {
@@ -29,9 +30,9 @@ export const deleteUser = async (req: express.Request, res: express.Response) =>
 export const updateUser = async (req: express.Request, res: express.Response) => {
     try {
         const { id } = req.params;
-        const { username } = req.body;
+        const { username, email, password } = req.body;
 
-        if (!username) {
+        if (!username && !email && !password) {
             return res.sendStatus(400);
         }
 
@@ -41,7 +42,18 @@ export const updateUser = async (req: express.Request, res: express.Response) =>
             return res.sendStatus(404);
         }
 
-        user.username = username;
+        if (username) user.username = username;
+        if (email) user.email = email;
+        if (password) {
+            if (!user.authentication) {
+                user.authentication = { password: '', salt: '' };
+            }
+            const salt = random();
+            const hashedPassword = authentication(salt, password);
+            user.authentication.password = hashedPassword;
+            user.authentication.salt = salt;
+        }
+
         await user.save();
 
         return res.status(200).json(user);
@@ -49,4 +61,4 @@ export const updateUser = async (req: express.Request, res: express.Response) =>
         console.log(error);
         return res.sendStatus(500);
     }
-}
+};

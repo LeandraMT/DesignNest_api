@@ -2,6 +2,7 @@ import express from 'express';
 import { get, merge } from 'lodash';
 
 import { getUserBySessionToken } from '../db/users';
+import { getDesignerBySessionToken } from '../db/designers';
 
 export const isAuthenticated = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
     try {
@@ -12,12 +13,14 @@ export const isAuthenticated = async (req: express.Request, res: express.Respons
         }
 
         const existingUser = await getUserBySessionToken(sessionToken);
+        const existingDesigner = await getDesignerBySessionToken(sessionToken);
 
-        if (!existingUser) {
+        if (!existingUser && !existingDesigner) {
             return res.sendStatus(403);
         }
 
-        merge(req, { identity: existingUser });
+        const identity = existingUser || existingDesigner;
+        merge(req, { identity });
 
         return next();
     } catch (error) {
