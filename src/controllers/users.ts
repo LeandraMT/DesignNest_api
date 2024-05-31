@@ -12,7 +12,7 @@ export const getAllUsers = async (req: express.Request, res: express.Response) =
         console.log(error);
         return res.sendStatus(500);
     }
-}
+};
 
 export const deleteUser = async (req: express.Request, res: express.Response) => {
     try {
