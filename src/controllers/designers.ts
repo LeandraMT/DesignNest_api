@@ -1,6 +1,6 @@
 import express from 'express';
 
-import { getDesigners, deleteDesignerById, updateDesignerById, getBlogPostsByDesigners } from '../db/designers';
+import { getDesigners, deleteDesignerById, updateDesignerById, getImages, addImage } from '../db/designers';
 
 export const getAllDesigners = async (req: express.Request, res: express.Response) => {
     try {
@@ -50,3 +50,38 @@ export const updateDesigner = async (req: express.Request, res: express.Response
         return res.sendStatus(500);
     }
 };
+
+
+// Media CRUD operations
+export const getAllImages = async (req: express.Request, res: express.Response) => {
+    try {
+        const images = await getImages();
+
+        return res.status(200).json(images);
+    } catch (error) {
+        console.log(error);
+        return res.sendStatus(500);
+    }
+}
+
+export const addImageDesigner = async (req: express.Request, res: express.Response) => {
+        try {
+            const { url, title, description } = req.body;
+    
+            if (!url || !title || !description) {
+                return res.sendStatus(400);
+            }
+    
+            const imageAdded = await addImage({
+                url,
+                title,
+                description,
+            });
+    
+            return res.status(201).json(imageAdded);
+        } catch (error) {
+            console.log(error);
+            return res.sendStatus(500);
+        }
+    
+}
