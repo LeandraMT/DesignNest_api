@@ -38,11 +38,12 @@ export const DesignerModel = mongoose.model('Designer', DesignerSchema);
 
 export const getDesigners = () => DesignerModel.find();
 export const getDesignerByEmail = (email: string) => DesignerModel.findOne({ email });
+export const getDesignerBySessionToken = (sessionToken: string) => DesignerModel.findOne({
+    'authentication.sessionToken': sessionToken
+});
 export const getDesignerById = (id: string) => DesignerModel.findById(id);
 export const createDesigner = (values: Record<string, any>) => new DesignerModel(values)
     .save().then((designer) => designer.toObject());
 export const deleteDesignerById = (id: string) => DesignerModel.findOneAndDelete({ _id: id });
 export const updateDesignerById = (id: string, values: Record<string, any>) => DesignerModel.findByIdAndUpdate(id, values, { new: true });
-export const getDesignerBySessionToken = (sessionToken: string) => DesignerModel.findOne({
-    'authentication.sessionToken': sessionToken
-});
+export const getBlogPostsByDesigners = (id: string) => DesignerModel.findById(id).populate('blogPosts');

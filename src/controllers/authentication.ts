@@ -69,6 +69,7 @@ export const login = async (req: express.Request, res: express.Response) => {
         const user = await getUserByEmail(email).select('+authentication.salt +authentication.password');
         const designer = await getDesignerByEmail(email).select('+authentication.salt +authentication.password');
         const account = user || designer;
+        console.log("Designer: ", designer);
 
         if (!account || !account.authentication) {
             return res.sendStatus(400);

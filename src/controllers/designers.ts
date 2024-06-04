@@ -1,11 +1,10 @@
 import express from 'express';
 
-import { getDesigners, deleteDesignerById, updateDesignerById } from '../db/designers';
+import { getDesigners, deleteDesignerById, updateDesignerById, getBlogPostsByDesigners } from '../db/designers';
 
 export const getAllDesigners = async (req: express.Request, res: express.Response) => {
     try {
         const designers = await getDesigners();
-        console.log("Fetching Designers: ", designers);
 
         return res.status(200).json(designers);
     } catch (error) {

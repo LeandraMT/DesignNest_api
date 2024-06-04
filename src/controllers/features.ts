@@ -1,6 +1,6 @@
 import express from 'express';
 
-import { DesignerBlogPostModel, MessageModel, deleteDesignerBlogPostById, getDesignerBlogPosts } from '../db/features';
+import { DesignerBlogPostModel, MessageModel, createDesignerBlogPost, deleteDesignerBlogPostById, getDesignerBlogPosts } from '../db/features';
 
 
 // Send messages
@@ -52,6 +52,7 @@ export const getMessagesForUser = async (req: express.Request, res: express.Resp
 };
 
 
+
 // BlogPosts
 export const createBlogPost = async (req: express.Request, res: express.Response) => {
     try {
@@ -61,13 +62,13 @@ export const createBlogPost = async (req: express.Request, res: express.Response
             return res.sendStatus(400);
         }
 
-        const blogPost = await DesignerBlogPostModel.create({
+        const blogPost = await createDesignerBlogPost({
             title,
             content,
-            author
+            author,
         });
 
-        return res.status(201).json(blogPost.toObject());
+        return res.status(201).json(blogPost);
     } catch (error) {
         console.log(error);
         return res.sendStatus(500);
