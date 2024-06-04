@@ -4,7 +4,7 @@ import { getDesigners, deleteDesignerById, updateDesignerById, getBlogPostsByDes
 
 export const getAllDesigners = async (req: express.Request, res: express.Response) => {
     try {
-        const designers = await getDesigners();
+        const designers = await getDesigners().populate('portfolio.images portfolio.videos portfolio.links');
 
         return res.status(200).json(designers);
     } catch (error) {

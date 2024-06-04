@@ -27,15 +27,20 @@ const DesignerSchema = new mongoose.Schema({
         sessionToken: { type: String, select: false },
     },
     portfolio: {
-        images: [{ type: String }],
-        videos: [{ type: String }],
+        images: [ImageSchema],
+        videos: [VideoSchema],
         links: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Link' }]
     },
     blogPosts: [{ type: mongoose.Schema.Types.ObjectId, ref: 'BlogPost' }]
 });
 
 export const DesignerModel = mongoose.model('Designer', DesignerSchema);
+export const LinkDesignerModel = mongoose.model('Link', LinkSchema);
+export const ImageDesignerModel = mongoose.model('Image', ImageSchema);
+export const VideoDesignerModel = mongoose.model('Video', VideoSchema);
 
+
+// Designer
 export const getDesigners = () => DesignerModel.find();
 export const getDesignerByEmail = (email: string) => DesignerModel.findOne({ email });
 export const getDesignerBySessionToken = (sessionToken: string) => DesignerModel.findOne({
@@ -47,3 +52,20 @@ export const createDesigner = (values: Record<string, any>) => new DesignerModel
 export const deleteDesignerById = (id: string) => DesignerModel.findOneAndDelete({ _id: id });
 export const updateDesignerById = (id: string, values: Record<string, any>) => DesignerModel.findByIdAndUpdate(id, values, { new: true });
 export const getBlogPostsByDesigners = (id: string) => DesignerModel.findById(id).populate('blogPosts');
+
+
+// Media endpoints
+export const getImages = () => ImageDesignerModel.find();
+export const addImage = (values: Record<string, any>) => new ImageDesignerModel(values);
+export const updateImage = (id: string, values: Record<string, any>) => ImageDesignerModel.findByIdAndUpdate(id, values, { new: true });
+export const deleteImage = (id: string) => ImageDesignerModel.findByIdAndDelete({ id: id });
+
+export const getVideos = () => VideoDesignerModel.find();
+export const addVideo = (values: Record<string, any>) => new VideoDesignerModel(values);
+export const updateVideo = (id: string, values: Record<string, any>) => VideoDesignerModel.findByIdAndUpdate(id, values, { new: true });
+export const deleteVideo = (id: string) => VideoDesignerModel.findByIdAndDelete({ id: id });
+
+export const getLinks = () => LinkDesignerModel.find();
+export const addLink = (values: Record<string, any>) => new LinkDesignerModel(values);
+export const updateLink = (id: string, values: Record<string, any>) => LinkDesignerModel.findByIdAndUpdate(id, values, { new: true });
+export const deleteLink = (id: string) => LinkDesignerModel.findByIdAndDelete({ id: id });
